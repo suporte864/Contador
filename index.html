@@ -2,189 +2,198 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Contador de Dias</title>
+<title>Contador de Acidentes</title>
 
 <style>
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
+
+/* RESET */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Área principal */
-body {
-    width: 624px;
-    height: 312px;
-    overflow: hidden;
+/* Corpo geral */
+body{
+    background:#f0f0f0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:20px;
 }
 
-/* Container */
-.container {
-    position: relative;
-    width: 624px;
-    height: 312px;
+/* Área do painel (624x312) */
+.painel{
+    position:relative;
+    width:624px;
+    height:312px;
+    overflow:hidden;
+    border-radius:10px;
 }
 
 /* Vídeo */
-video {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.painel video{
+    position:absolute;
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
 /* Camada escura */
-.overlay {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.55);
+.overlay{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(255,255,255,0.75);
 }
 
 /* Conteúdo */
-.content {
-    position: relative;
-    z-index: 2;
-    color: white;
-    width: 100%;
-    height: 100%;
+.conteudo{
+    position:relative;
+    z-index:2;
+    width:100%;
+    height:100%;
+    color:#003366;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
 }
 
 /* Título */
-.title {
-    font-size: 26px;
-    font-weight: bold;
-    margin-bottom: 5px;
+.titulo{
+    font-size:32px;
+    font-weight:bold;
 }
 
-/* Número */
-.counter {
-    font-size: 60px;
-    font-weight: bold;
-    color: #00ff99;
-    margin-bottom: 5px;
+/* Contador */
+.numero{
+    font-size:72px;
+    font-weight:bold;
+    margin:5px 0;
 }
 
-/* Informações */
-.info {
-    font-size: 13px;
-    margin: 2px 0;
+/* Infos */
+.info{
+    font-size:18px;
+    margin:2px;
 }
 
-/* Área dos botões */
-.buttons {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
+/* Controles fora */
+.controles{
+    margin-top:15px;
+    display:flex;
+    gap:10px;
+    align-items:center;
 }
 
 /* Botões */
-button {
-    padding: 5px 12px;
-    border: none;
-    border-radius: 5px;
-    background: #00ff99;
-    color: black;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 12px;
+button{
+    padding:8px 16px;
+    border:none;
+    border-radius:6px;
+    background:#003366;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-button:hover {
-    background: #00cc7a;
+button:hover{
+    background:#002244;
 }
 
-/* Input data */
-input[type="date"] {
-    padding: 4px;
-    border-radius: 5px;
-    border: none;
-    font-size: 12px;
+/* Input */
+input[type="date"]{
+    padding:7px;
+    border-radius:5px;
+    border:1px solid #ccc;
+    font-size:14px;
 }
+
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- PAINEL -->
+<div class="painel">
 
-    <!-- Vídeo -->
-    <video autoplay muted loop>
-        <source src="video.mp4" type="video/mp4">
+    <video autoplay muted loop playsinline>
+        <source src="fundo.mp4" type="video/mp4">
     </video>
 
-    <!-- Escurecer fundo -->
     <div class="overlay"></div>
 
-    <!-- Conteúdo -->
-    <div class="content">
+    <div class="conteudo">
 
-        <div class="title">Dias sem Acidentes</div>
+        <div class="titulo">Dias sem Acidentes</div>
 
-        <div class="counter" id="dias">0</div>
+        <div class="numero" id="dias">0</div>
 
         <div class="info" id="data"></div>
         <div class="info" id="hora"></div>
         <div class="info" id="recorde"></div>
 
-        <!-- Área de botões -->
-        <div class="buttons">
-
-            <input type="date" id="dataInicio">
-
-            <button onclick="definirData()">
-                Definir Início
-            </button>
-
-            <button onclick="reiniciar()">
-                Reiniciar
-            </button>
-
-        </div>
-
     </div>
 
 </div>
 
+
+<!-- CONTROLES -->
+<div class="controles">
+
+    <input type="date" id="dataInicio">
+
+    <button onclick="definirData()">
+        Definir Início
+    </button>
+
+    <button onclick="reiniciar()">
+        Reiniciar
+    </button>
+
+</div>
+
+
 <script>
 
-// Data padrão
+/* Data inicial */
 let dataInicial = localStorage.getItem("dataInicial");
 
-if (!dataInicial) {
+if(!dataInicial){
     dataInicial = "2023-12-10";
     localStorage.setItem("dataInicial", dataInicial);
 }
 
-// Coloca a data no input
 document.getElementById("dataInicio").value = dataInicial;
 
-// Calcular dias
-function calcularDias() {
 
-    const inicio = new Date(dataInicial);
-    const hoje = new Date();
+/* Calcular dias */
+function calcularDias(){
+
+    const inicio = new Date(dataInicial + "T00:00:00");
+    const agora = new Date();
+
+    const hojeSP = new Date(
+        agora.toLocaleString("en-US",{timeZone:"America/Sao_Paulo"})
+    );
 
     inicio.setHours(0,0,0,0);
-    hoje.setHours(0,0,0,0);
+    hojeSP.setHours(0,0,0,0);
 
-    const diff = hoje - inicio;
-    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const diff = hojeSP - inicio;
+
+    const dias = Math.floor(diff / (1000*60*60*24));
 
     document.getElementById("dias").innerText = dias;
 
-    // Recorde
+    /* Recorde */
     let recorde = localStorage.getItem("recorde");
 
-    if (!recorde || dias > recorde) {
+    if(!recorde || dias > recorde){
         recorde = dias;
         localStorage.setItem("recorde", recorde);
     }
@@ -193,61 +202,60 @@ function calcularDias() {
         "Recorde: " + recorde + " dias";
 }
 
-// Atualizar data
-function atualizarData() {
 
-    const hoje = new Date();
+/* Data */
+function atualizarData(){
 
-    const data = hoje.toLocaleDateString("pt-BR", {
-        timeZone: "America/Sao_Paulo"
+    const hoje = new Date().toLocaleDateString("pt-BR",{
+        timeZone:"America/Sao_Paulo"
     });
 
     document.getElementById("data").innerText =
-        "Data: " + data;
+        "Data: " + hoje;
 }
 
-// Atualizar hora
-function atualizarHora() {
 
-    const agora = new Date();
+/* Hora */
+function atualizarHora(){
 
-    const hora = agora.toLocaleTimeString("pt-BR", {
-        timeZone: "America/Sao_Paulo"
+    const hora = new Date().toLocaleTimeString("pt-BR",{
+        timeZone:"America/Sao_Paulo",
+        hour12:false
     });
 
     document.getElementById("hora").innerText =
         "Hora: " + hora;
 }
 
-// Definir data manual
-function definirData() {
 
-    const novaData = document.getElementById("dataInicio").value;
+/* Definir data */
+function definirData(){
 
-    if (!novaData) {
+    const nova = document.getElementById("dataInicio").value;
+
+    if(!nova){
         alert("Selecione uma data.");
         return;
     }
 
-    dataInicial = novaData;
+    dataInicial = nova;
 
     localStorage.setItem("dataInicial", dataInicial);
 
     calcularDias();
 }
 
-// Reiniciar = hoje
-function reiniciar() {
 
-    if (confirm("Deseja reiniciar para hoje?")) {
+/* Reiniciar */
+function reiniciar(){
 
-        const hoje = new Date();
+    if(confirm("Reiniciar para hoje?")){
 
-        const ano = hoje.getFullYear();
-        const mes = String(hoje.getMonth()+1).padStart(2,"0");
-        const dia = String(hoje.getDate()).padStart(2,"0");
+        const hoje = new Date().toLocaleDateString("en-CA",{
+            timeZone:"America/Sao_Paulo"
+        });
 
-        dataInicial = `${ano}-${mes}-${dia}`;
+        dataInicial = hoje;
 
         localStorage.setItem("dataInicial", dataInicial);
 
@@ -257,13 +265,14 @@ function reiniciar() {
     }
 }
 
-// Inicialização
+
+/* Inicialização */
 calcularDias();
 atualizarData();
 atualizarHora();
 
-setInterval(atualizarHora, 1000);
-setInterval(calcularDias, 60000);
+setInterval(atualizarHora,1000);
+setInterval(calcularDias,60000);
 
 </script>
 
