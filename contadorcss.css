@@ -1,2 +1,7 @@
 contador.html
 fundo.mp4
+.overlay {
+    background: rgba(255,255,255,0.3);
+}
+
+
