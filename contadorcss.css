@@ -3,23 +3,16 @@ video3.mp4
 .overlay{
     display: none;
 {
-.painel video{
-    position:absolute;
-    top:0;
-    left:0;
-
+.painel{
     width:624px;
     height:312px;
 
-    min-width:100%;
-    min-height:100%;
+    transform: scale(2.05); /* AJUSTAR MANUALMENTE */
+    transform-origin: top left;
 
-    transform: translate(0,0);
-
-    object-fit:fill;   /* FORÇA preencher */
-    object-position:center;
-
-    background:black;
+    position:absolute;
+    top:0;
+    left:0;
 }
 
 
