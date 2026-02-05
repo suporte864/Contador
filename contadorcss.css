@@ -7,13 +7,14 @@ video3.mp4
     width:624px;
     height:312px;
 
-    transform: scale(2.05); /* AJUSTAR MANUALMENTE */
+    transform: scale(3.05); /* AJUSTAR MANUALMENTE */
     transform-origin: top left;
 
     position:absolute;
     top:0;
     left:0;
 }
+
 
 
 
