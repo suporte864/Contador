@@ -2,114 +2,143 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-
-<!-- Força resolução correta na TB10 -->
-<meta name="viewport" content="width=624, height=312, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>Dias sem Acidentes</title>
+<title>Contador de Dias</title>
 
 <style>
-
-/* RESET TOTAL */
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family: Arial, Helvetica, sans-serif;
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 
-html, body{
-    width:624px;
-    height:312px;
-    overflow:hidden;
-    background:black;
+/* Área principal */
+body {
+    width: 624px;
+    height: 312px;
+    overflow: hidden;
+    background: black;
 }
 
-/* PAINEL */
-.painel{
-    position:relative;
-    width:624px;
-    height:312px;
-    overflow:hidden;
+/* Container */
+.container {
+    position: relative;
+    width: 624px;
+    height: 312px;
 }
 
-/* VIDEO */
-video{
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
+/* Vídeo */
+video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* OVERLAY LEVE (remove se quiser) */
-.overlay{
-    position:absolute;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.25);
+/* Camada escura */
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
 }
 
-/* CONTEUDO */
-.conteudo{
-    position:absolute;
-    inset:0;
-    z-index:2;
+/* Conteúdo */
+.content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    width: 100%;
+    height: 100%;
 
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-
-    color:#003366;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-/* TEXTO */
-.titulo{
-    font-size:30px;
-    font-weight:bold;
+/* Título */
+.title {
+    font-size: 34px;
+    font-weight: bold;
+    margin-bottom: 6px;
 }
 
-.numero{
-    font-size:70px;
-    font-weight:bold;
-    margin:4px 0;
+/* Número */
+.counter {
+    font-size: 80px;
+    font-weight: bold;
+    color: #00ff99;
+    margin-bottom: 6px;
 }
 
-.info{
-    font-size:16px;
-    margin:1px 0;
+/* Informações */
+.info {
+    font-size: 18px;
+    margin: 2px 0;
 }
 
-/* CONTROLES (FORA DA TELA LED) */
-.controles{
-    display:none; /* TB10 não usa */
+/* Área dos botões (OCULTA NO PAINEL) */
+.buttons {
+    display: none;
 }
 
+/* Botões (mantidos para uso no PC) */
+button {
+    padding: 5px 12px;
+    border: none;
+    border-radius: 5px;
+    background: #00ff99;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+input[type="date"] {
+    padding: 4px;
+    border-radius: 5px;
+    border: none;
+    font-size: 12px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="painel">
+<div class="container">
 
-    <video autoplay muted loop playsinline>
+    <!-- Vídeo -->
+    <video autoplay muted loop>
         <source src="video4.mp4" type="video/mp4">
     </video>
 
+    <!-- Escurecer fundo -->
     <div class="overlay"></div>
 
-    <div class="conteudo">
+    <!-- Conteúdo -->
+    <div class="content">
 
-        <div class="titulo">Dias sem Acidentes</div>
+        <div class="title">Dias sem Acidentes</div>
 
-        <div class="numero" id="dias">0</div>
+        <div class="counter" id="dias">0</div>
 
         <div class="info" id="data"></div>
         <div class="info" id="hora"></div>
         <div class="info" id="recorde"></div>
+
+        <!-- Botões ocultos -->
+        <div class="buttons">
+
+            <input type="date" id="dataInicio">
+
+            <button onclick="definirData()">Definir Início</button>
+
+            <button onclick="reiniciar()">Reiniciar</button>
+
+        </div>
 
     </div>
 
@@ -117,50 +146,33 @@ video{
 
 <script>
 
-/* DATA INICIAL */
+// Data padrão
 let dataInicial = localStorage.getItem("dataInicial");
 
-if(!dataInicial){
+if (!dataInicial) {
     dataInicial = "2023-12-10";
     localStorage.setItem("dataInicial", dataInicial);
 }
 
-/* FUNÇÃO DATA SP */
-function agoraSP(){
+document.getElementById("dataInicio").value = dataInicial;
 
-    const agora = new Date();
+// Calcular dias
+function calcularDias() {
 
-    return new Date(
-        agora.toLocaleString("pt-BR",{
-            timeZone:"America/Sao_Paulo"
-        })
-    );
-}
-
-/* CALCULAR DIAS */
-function calcularDias(){
-
-    const inicio = new Date(dataInicial+"T00:00:00");
-
-    const hoje = agoraSP();
+    const inicio = new Date(dataInicial);
+    const hoje = new Date();
 
     inicio.setHours(0,0,0,0);
     hoje.setHours(0,0,0,0);
 
-    const diff = hoje.getTime() - inicio.getTime();
-
-    const dias = Math.max(0, Math.floor(diff / 86400000));
+    const diff = hoje - inicio;
+    const dias = Math.floor(diff / 86400000);
 
     document.getElementById("dias").innerText = dias;
 
-    /* RECORDE */
     let recorde = localStorage.getItem("recorde");
 
-    if(!recorde){
-        recorde = dias;
-    }
-
-    if(dias > recorde){
+    if (!recorde || dias > recorde) {
         recorde = dias;
         localStorage.setItem("recorde", recorde);
     }
@@ -169,45 +181,73 @@ function calcularDias(){
         "Recorde: " + recorde + " dias";
 }
 
-/* DATA */
-function atualizarData(){
+// Atualizar data
+function atualizarData() {
 
-    const hoje = agoraSP();
+    const hoje = new Date();
 
-    const data = hoje.toLocaleDateString("pt-BR");
+    const data = hoje.toLocaleDateString("pt-BR", {
+        timeZone: "America/Sao_Paulo"
+    });
 
     document.getElementById("data").innerText =
         "Data: " + data;
 }
 
-/* HORA */
-function atualizarHora(){
+// Atualizar hora
+function atualizarHora() {
 
-    const hoje = agoraSP();
+    const agora = new Date();
 
-    const hora = hoje.toLocaleTimeString("pt-BR",{
-        hour12:false
+    const hora = agora.toLocaleTimeString("pt-BR", {
+        timeZone: "America/Sao_Paulo"
     });
 
     document.getElementById("hora").innerText =
         "Hora: " + hora;
 }
 
-/* INICIAL */
-function iniciar(){
+// Definir data
+function definirData() {
+
+    const novaData = document.getElementById("dataInicio").value;
+
+    if (!novaData) return;
+
+    dataInicial = novaData;
+
+    localStorage.setItem("dataInicial", dataInicial);
 
     calcularDias();
-    atualizarData();
-    atualizarHora();
-
-    setInterval(atualizarHora,1000);
-    setInterval(calcularDias,60000);
 }
 
-iniciar();
+// Reiniciar
+function reiniciar() {
+
+    const hoje = new Date();
+
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth()+1).padStart(2,"0");
+    const dia = String(hoje.getDate()).padStart(2,"0");
+
+    dataInicial = `${ano}-${mes}-${dia}`;
+
+    localStorage.setItem("dataInicial", dataInicial);
+
+    document.getElementById("dataInicio").value = dataInicial;
+
+    calcularDias();
+}
+
+// Inicialização
+calcularDias();
+atualizarData();
+atualizarHora();
+
+setInterval(atualizarHora, 1000);
+setInterval(calcularDias, 60000);
 
 </script>
 
 </body>
 </html>
-
