@@ -1,29 +1,17 @@
-contador.html
-video4.mp4
-.overlay{
+/* Esconder overlay (clareamento) */
+.overlay {
     display: none;
-{
-.painel{
-    width:624px;
-    height:312px;
-
-    transform: scale(3.05); /* AJUSTAR MANUALMENTE */
-    transform-origin: top left;
-
-    position:absolute;
-    top:0;
-    left:0;
 }
 
+/* Painel */
+.painel {
+    width: 624px;
+    height: 312px;
 
+    position: absolute;
+    top: 0;
+    left: 0;
 
-
-
-
-
-
-
-
-
-
-
+    transform: scale(3.05); /* ajuste se precisar */
+    transform-origin: top left;
+}
