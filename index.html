@@ -2,13 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-    <meta name="viewport" content="width=624, height=312, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Contador de Acidentes</title>
+<!-- Força resolução correta na TB10 -->
+<meta name="viewport" content="width=624, height=312, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Dias sem Acidentes</title>
 
 <style>
 
-/* RESET */
+/* RESET TOTAL */
 *{
     margin:0;
     padding:0;
@@ -16,109 +18,74 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Corpo geral */
-body{
-    background:#f0f0f0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:20px;
+html, body{
+    width:624px;
+    height:312px;
+    overflow:hidden;
+    background:black;
 }
 
-/* Área do painel (624x312) */
+/* PAINEL */
 .painel{
     position:relative;
     width:624px;
     height:312px;
     overflow:hidden;
-    border-radius:10px;
-    background:black;
 }
 
-/* Vídeo */
-.painel video{
+/* VIDEO */
+video{
     position:absolute;
     top:0;
     left:0;
-
     width:100%;
     height:100%;
-
-    object-fit:contain; /* NÃO CORTA */
-    background:black;
+    object-fit:cover;
 }
 
-/* Camada escura */
+/* OVERLAY LEVE (remove se quiser) */
 .overlay{
     position:absolute;
     width:100%;
     height:100%;
-    background:rgba(0,0,0,0.25); /* Leve escurecimento */
+    background:rgba(0,0,0,0.25);
 }
 
-/* Conteúdo */
+/* CONTEUDO */
 .conteudo{
-    position:relative;
+    position:absolute;
+    inset:0;
     z-index:2;
-    width:100%;
-    height:100%;
-    color:#003366;
 
     display:flex;
     flex-direction:column;
     justify-content:center;
     align-items:center;
     text-align:center;
+
+    color:#003366;
 }
 
-/* Título */
+/* TEXTO */
 .titulo{
-    font-size:34px;
+    font-size:30px;
     font-weight:bold;
 }
 
-/* Contador */
 .numero{
-    font-size:76px;
+    font-size:70px;
     font-weight:bold;
-    margin:5px 0;
+    margin:4px 0;
 }
 
-/* Infos */
 .info{
-    font-size:18px;
-    margin:2px;
+    font-size:16px;
+    margin:1px 0;
 }
 
-/* Controles fora */
+/* CONTROLES (FORA DA TELA LED) */
 .controles{
-    margin-top:15px;
-    display:flex;
-    gap:10px;
-    align-items:center;
-}
-
-/* Botões */
-button{
-    padding:8px 16px;
-    border:none;
-    border-radius:6px;
-    background:#003366;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#002244;
-}
-
-/* Input */
-input[type="date"]{
-    padding:7px;
-    border-radius:5px;
-    border:1px solid #ccc;
-    font-size:14px;
+    display:none; /* TB10 não usa */
 }
 
 </style>
@@ -126,11 +93,10 @@ input[type="date"]{
 
 <body>
 
-<!-- PAINEL -->
 <div class="painel">
 
     <video autoplay muted loop playsinline>
-        <source src="video4.mp4" type="video/mp4">
+        <source src="fundo.mp4" type="video/mp4">
     </video>
 
     <div class="overlay"></div>
@@ -149,26 +115,9 @@ input[type="date"]{
 
 </div>
 
-
-<!-- CONTROLES -->
-<div class="controles">
-
-    <input type="date" id="dataInicio">
-
-    <button onclick="definirData()">
-        Definir Início
-    </button>
-
-    <button onclick="reiniciar()">
-        Reiniciar
-    </button>
-
-</div>
-
-
 <script>
 
-/* Data inicial */
+/* DATA INICIAL */
 let dataInicial = localStorage.getItem("dataInicial");
 
 if(!dataInicial){
@@ -176,35 +125,42 @@ if(!dataInicial){
     localStorage.setItem("dataInicial", dataInicial);
 }
 
-document.getElementById("dataInicio").value = dataInicial;
-
-
-/* Calcular dias */
-function calcularDias(){
-
-    const inicio = new Date(dataInicial + "T00:00:00-03:00");
+/* FUNÇÃO DATA SP */
+function agoraSP(){
 
     const agora = new Date();
 
-    const hojeSP = new Date(
-        agora.toLocaleString("pt-BR", {
-            timeZone: "America/Sao_Paulo"
+    return new Date(
+        agora.toLocaleString("pt-BR",{
+            timeZone:"America/Sao_Paulo"
         })
     );
+}
+
+/* CALCULAR DIAS */
+function calcularDias(){
+
+    const inicio = new Date(dataInicial+"T00:00:00");
+
+    const hoje = agoraSP();
 
     inicio.setHours(0,0,0,0);
-    hojeSP.setHours(0,0,0,0);
+    hoje.setHours(0,0,0,0);
 
-    const diff = hojeSP.getTime() - inicio.getTime();
+    const diff = hoje.getTime() - inicio.getTime();
 
-    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const dias = Math.max(0, Math.floor(diff / 86400000));
 
     document.getElementById("dias").innerText = dias;
 
-    /* Recorde */
+    /* RECORDE */
     let recorde = localStorage.getItem("recorde");
 
-    if(!recorde || dias > recorde){
+    if(!recorde){
+        recorde = dias;
+    }
+
+    if(dias > recorde){
         recorde = dias;
         localStorage.setItem("recorde", recorde);
     }
@@ -213,24 +169,23 @@ function calcularDias(){
         "Recorde: " + recorde + " dias";
 }
 
-
-/* Data */
+/* DATA */
 function atualizarData(){
 
-    const hoje = new Date().toLocaleDateString("pt-BR",{
-        timeZone:"America/Sao_Paulo"
-    });
+    const hoje = agoraSP();
+
+    const data = hoje.toLocaleDateString("pt-BR");
 
     document.getElementById("data").innerText =
-        "Data: " + hoje;
+        "Data: " + data;
 }
 
-
-/* Hora */
+/* HORA */
 function atualizarHora(){
 
-    const hora = new Date().toLocaleTimeString("pt-BR",{
-        timeZone:"America/Sao_Paulo",
+    const hoje = agoraSP();
+
+    const hora = hoje.toLocaleTimeString("pt-BR",{
         hour12:false
     });
 
@@ -238,56 +193,20 @@ function atualizarHora(){
         "Hora: " + hora;
 }
 
-
-/* Definir data */
-function definirData(){
-
-    const nova = document.getElementById("dataInicio").value;
-
-    if(!nova){
-        alert("Selecione uma data.");
-        return;
-    }
-
-    dataInicial = nova;
-
-    localStorage.setItem("dataInicial", dataInicial);
+/* INICIAL */
+function iniciar(){
 
     calcularDias();
+    atualizarData();
+    atualizarHora();
+
+    setInterval(atualizarHora,1000);
+    setInterval(calcularDias,60000);
 }
 
-
-/* Reiniciar */
-function reiniciar(){
-
-    if(confirm("Reiniciar para hoje?")){
-
-        const hoje = new Date().toLocaleDateString("en-CA",{
-            timeZone:"America/Sao_Paulo"
-        });
-
-        dataInicial = hoje;
-
-        localStorage.setItem("dataInicial", dataInicial);
-
-        document.getElementById("dataInicio").value = dataInicial;
-
-        calcularDias();
-    }
-}
-
-
-/* Inicialização */
-calcularDias();
-atualizarData();
-atualizarHora();
-
-setInterval(atualizarHora,1000);
-setInterval(calcularDias,60000);
+iniciar();
 
 </script>
 
 </body>
 </html>
-
-
