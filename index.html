@@ -18,12 +18,11 @@ body {
     width: 624px;
     height: 312px;
     overflow: hidden;
-    background: black;
 }
 
 /* Container */
 .container {
-    position: absolute;
+    position: relative;
     width: 624px;
     height: 312px;
 }
@@ -41,7 +40,7 @@ video {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.45);
+    background: rgba(0,0,0,0.55);
 }
 
 /* Conteúdo */
@@ -61,31 +60,33 @@ video {
 
 /* Título */
 .title {
-    font-size: 34px;
+    font-size: 26px;
     font-weight: bold;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 /* Número */
 .counter {
-    font-size: 80px;
+    font-size: 60px;
     font-weight: bold;
     color: #00ff99;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 /* Informações */
 .info {
-    font-size: 18px;
+    font-size: 13px;
     margin: 2px 0;
 }
 
-/* Área dos botões (OCULTA NO PAINEL) */
+/* Área dos botões */
 .buttons {
-    display: none;
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
 }
 
-/* Botões (mantidos para uso no PC) */
+/* Botões */
 button {
     padding: 5px 12px;
     border: none;
@@ -97,6 +98,11 @@ button {
     font-size: 12px;
 }
 
+button:hover {
+    background: #00cc7a;
+}
+
+/* Input data */
 input[type="date"] {
     padding: 4px;
     border-radius: 5px;
@@ -129,14 +135,18 @@ input[type="date"] {
         <div class="info" id="hora"></div>
         <div class="info" id="recorde"></div>
 
-        <!-- Botões ocultos -->
+        <!-- Área de botões -->
         <div class="buttons">
 
             <input type="date" id="dataInicio">
 
-            <button onclick="definirData()">Definir Início</button>
+            <button onclick="definirData()">
+                Definir Início
+            </button>
 
-            <button onclick="reiniciar()">Reiniciar</button>
+            <button onclick="reiniciar()">
+                Reiniciar
+            </button>
 
         </div>
 
@@ -154,6 +164,7 @@ if (!dataInicial) {
     localStorage.setItem("dataInicial", dataInicial);
 }
 
+// Coloca a data no input
 document.getElementById("dataInicio").value = dataInicial;
 
 // Calcular dias
@@ -166,10 +177,11 @@ function calcularDias() {
     hoje.setHours(0,0,0,0);
 
     const diff = hoje - inicio;
-    const dias = Math.floor(diff / 86400000);
+    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     document.getElementById("dias").innerText = dias;
 
+    // Recorde
     let recorde = localStorage.getItem("recorde");
 
     if (!recorde || dias > recorde) {
@@ -207,12 +219,15 @@ function atualizarHora() {
         "Hora: " + hora;
 }
 
-// Definir data
+// Definir data manual
 function definirData() {
 
     const novaData = document.getElementById("dataInicio").value;
 
-    if (!novaData) return;
+    if (!novaData) {
+        alert("Selecione uma data.");
+        return;
+    }
 
     dataInicial = novaData;
 
@@ -221,22 +236,25 @@ function definirData() {
     calcularDias();
 }
 
-// Reiniciar
+// Reiniciar = hoje
 function reiniciar() {
 
-    const hoje = new Date();
+    if (confirm("Deseja reiniciar para hoje?")) {
 
-    const ano = hoje.getFullYear();
-    const mes = String(hoje.getMonth()+1).padStart(2,"0");
-    const dia = String(hoje.getDate()).padStart(2,"0");
+        const hoje = new Date();
 
-    dataInicial = `${ano}-${mes}-${dia}`;
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth()+1).padStart(2,"0");
+        const dia = String(hoje.getDate()).padStart(2,"0");
 
-    localStorage.setItem("dataInicial", dataInicial);
+        dataInicial = `${ano}-${mes}-${dia}`;
 
-    document.getElementById("dataInicio").value = dataInicial;
+        localStorage.setItem("dataInicial", dataInicial);
 
-    calcularDias();
+        document.getElementById("dataInicio").value = dataInicial;
+
+        calcularDias();
+    }
 }
 
 // Inicialização
@@ -251,4 +269,3 @@ setInterval(calcularDias, 60000);
 
 </body>
 </html>
-
